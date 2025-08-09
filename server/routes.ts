@@ -74,20 +74,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Sync emails endpoint
-  app.post("/api/sync", requireAuth, async (req, res) => {
-    try {
-      // TODO: Implement Google Apps Script webhook call
-      // For now, return success message
-      res.json({ 
-        success: true, 
-        message: "Email sync initiated. This will connect to Google Apps Script in production.",
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error("Sync error:", error);
-      res.status(500).json({ error: "Sync failed" });
+  // Replace the existing /api/sync endpoint in server/routes.ts
+
+app.post("/api/sync", requireAuth, async (req, res) => {
+  const appsScriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
+
+  if (!appsScriptUrl) {
+    console.error("FATAL: GOOGLE_APPS_SCRIPT_URL is not set.");
+    return res.status(500).json({ 
+      success: false, 
+      error: "Sync service is not configured." 
+    });
+  }
+
+  try {
+    // Here you would get a valid OAuth access token for the user.
+    // This is a placeholder as we haven't implemented full OAuth yet.
+    const userAccessToken = "placeholder_access_token_from_user_session";
+
+    const response = await fetch(appsScriptUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        // The script will need a way to identify the user,
+        // which would typically be an access token.
+        userId: req.session.user?.id,
+        accessToken: userAccessToken 
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Google Apps Script returned an error.");
     }
-  });
+
+    res.json({ 
+      success: true, 
+      message: "Email sync initiated successfully!",
+      details: result
+    });
+
+  } catch (error) {
+    console.error("Sync error:", error);
+    res.status(500).json({ success: false, error: (error as Error).message });
+  }
+});
 
       // CONSOLIDATED CSV Export Endpoint
   app.get("/api/export/csv", requireAuth, async (req, res) => {
