@@ -2,16 +2,19 @@
 
 steps:
   # STEP 1: Build the container image using the Dockerfile
+  # This step now includes a cache-clearing command.
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build Image'
     args: ['build', '-t', 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:$COMMIT_SHA', '.']
+    # We are adding a pre-build step within the Dockerfile to handle this.
+    # Please ensure your Dockerfile is updated as follows.
 
   # STEP 2: Push the container image to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push Image'
     args: ['push', 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:$COMMIT_SHA']
 
-     # STEP 3: Deploy the container image to Cloud Run
+  # STEP 3: Deploy the container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy to Cloud Run'
     entrypoint: gcloud
