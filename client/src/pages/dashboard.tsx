@@ -39,11 +39,31 @@ export default function Dashboard() {
               </div>
               
               <div className="flex items-center space-x-3">
-                <Button className="gradient-pink-magenta text-white action-btn">
+                <Button 
+                  className="gradient-pink-magenta text-white action-btn"
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/sync', { method: 'POST' });
+                      const result = await response.json();
+                      if (result.success) {
+                        alert('Email sync initiated successfully!');
+                      }
+                    } catch (error) {
+                      console.error('Sync failed:', error);
+                      alert('Sync failed. Please try again.');
+                    }
+                  }}
+                  data-testid="button-sync-emails"
+                >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Sync Emails
                 </Button>
-                <Button variant="outline" className="border-primary-500/50 text-purple-300 hover:text-white">
+                <Button 
+                  variant="outline" 
+                  className="border-primary-500/50 text-purple-300 hover:text-white"
+                  onClick={() => window.open('/api/emails/export', '_blank')}
+                  data-testid="button-export-data"
+                >
                   <Download className="w-4 h-4 mr-2" />
                   Export Data
                 </Button>

@@ -12,14 +12,13 @@ export default function Sidebar() {
   const [location] = useLocation();
 
   const menuItems = [
-    { href: "/", icon: BarChart3, label: "Dashboard", active: location === "/" },
+    { href: "/dashboard", icon: BarChart3, label: "Dashboard", active: location === "/dashboard" },
     { href: "/emails", icon: Mail, label: "Emails" },
-    { href: "/documents", icon: FileText, label: "Documents" },
+    { href: "/contacts", icon: Users, label: "Contacts" },
     { href: "/labels", icon: Tag, label: "Labels" },
   ];
 
   const managementItems = [
-    { href: "/users", icon: Users, label: "Users" },
     { href: "/settings", icon: Settings, label: "Settings" },
   ];
 

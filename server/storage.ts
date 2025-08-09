@@ -70,7 +70,7 @@ export class DatabaseStorage implements IStorage {
     dateFrom?: Date,
     dateTo?: Date
   ): Promise<EmailWithLabels[]> {
-    let query = db
+    let baseQuery = db
       .select({
         id: emails.id,
         subject: emails.subject,
@@ -111,8 +111,9 @@ export class DatabaseStorage implements IStorage {
       conditions.push(lte(emails.receivedAt, dateTo));
     }
     
+    let query = baseQuery;
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      query = baseQuery.where(and(...conditions));
     }
 
     const emailResults = await query;

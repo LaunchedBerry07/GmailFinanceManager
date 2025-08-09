@@ -41,23 +41,23 @@
   --font-mono: Menlo, monospace;
   --radius: 1rem;
   
-  /* Custom DataBerry colors */
-  --primary-50: hsl(261, 100%, 97%);
-  --primary-100: hsl(261, 93%, 73%);
-  --primary-200: hsl(261, 93%, 68%);
-  --primary-300: hsl(261, 93%, 63%);
-  --primary-400: hsl(261, 93%, 58%);
-  --primary-500: hsl(245, 39%, 60%);
-  --primary-600: hsl(236, 33%, 41%);
-  --primary-700: hsl(236, 46%, 38%);
-  --primary-800: hsl(240, 33%, 29%);
-  --primary-900: hsl(240, 33%, 9%);
+  /* Custom DataBerry colors matching brand palette */
+  --primary-50: hsl(285, 65%, 95%);
+  --primary-100: hsl(283, 85%, 80%);
+  --primary-200: hsl(281, 88%, 70%);
+  --primary-300: hsl(279, 90%, 60%);
+  --primary-400: hsl(277, 92%, 50%);
+  --primary-500: hsl(245, 58%, 51%);
+  --primary-600: hsl(236, 39%, 43%);
+  --primary-700: hsl(227, 46%, 38%);
+  --primary-800: hsl(218, 33%, 29%);
+  --primary-900: hsl(215, 28%, 17%);
   
-  --accent-cyan: hsl(195, 100%, 60%);
+  --accent-cyan: hsl(195, 100%, 50%);
   --accent-blue: hsl(212, 100%, 42%);
-  --accent-pink: hsl(326, 100%, 65%);
-  --accent-magenta: hsl(326, 100%, 59%);
-  --accent-dark-magenta: hsl(326, 100%, 33%);
+  --accent-pink: hsl(320, 100%, 70%);
+  --accent-magenta: hsl(310, 100%, 59%);
+  --accent-dark-magenta: hsl(310, 100%, 33%);
 }
 
 @layer base {

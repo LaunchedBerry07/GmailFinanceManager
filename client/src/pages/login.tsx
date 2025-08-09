@@ -15,9 +15,10 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
-    // TODO: Implement Google OAuth with NextAuth.js
+    // TODO: Implement Google OAuth
     // For now, simulate successful login
     setTimeout(() => {
+      localStorage.setItem('auth-token', 'demo-token');
       setLocation("/dashboard");
     }, 1000);
   };
@@ -25,10 +26,28 @@ export default function LoginPage() {
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // TODO: Implement email/password authentication
-    setTimeout(() => {
-      setLocation("/dashboard");
-    }, 1000);
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: email, password })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        localStorage.setItem('auth-token', 'logged-in');
+        setLocation("/dashboard");
+      } else {
+        alert(result.error || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

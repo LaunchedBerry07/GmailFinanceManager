@@ -60,6 +60,15 @@ export default function EmailsPage() {
                 <Button 
                   variant="outline"
                   className="border-primary-500/50 text-purple-300 hover:text-white"
+                  onClick={() => {
+                    const params = new URLSearchParams({
+                      ...(searchQuery && { search: searchQuery }),
+                      ...(selectedCategory !== "All Categories" && { category: selectedCategory }),
+                      ...(dateRange !== "Last 30 days" && { dateRange })
+                    });
+                    window.open(`/api/emails/export?${params.toString()}`, '_blank');
+                  }}
+                  data-testid="button-export-csv"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export to CSV
