@@ -44,6 +44,38 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+// Add these new functions inside the DatabaseStorage class in server/storage.ts
+
+async getExpensesByCategory(): Promise<{ name: string; amount: number }[]> {
+    const result = await db
+    .select({
+        name: emails.category,
+        amount: sql<number>`sum(${emails.amount})::float`,
+    })
+    .from(emails)
+    .where(sql`${emails.amount} IS NOT NULL`)
+    .groupBy(emails.category)
+    .orderBy(sql`sum(${emails.amount}) DESC`)
+    .limit(5);
+
+    return result;
+}
+
+async getTransactionVolume(): Promise<{ name: string; emails: number }[]> {
+    const result = await db.execute(sql`
+    SELECT
+        to_char(date_trunc('month', ${emails.receivedAt}), 'Mon') as name,
+        count(*)::int as emails
+    FROM ${emails}
+    WHERE ${emails.receivedAt} > now() - interval '6 months'
+    GROUP BY 1
+    ORDER BY date_trunc('month', ${emails.receivedAt}) ASC;
+    `);
+
+    // Drizzle with raw query returns rows as an array, needs mapping
+    return result.rows as { name: string; emails: number }[];
+}
+
   async getUserByUsername(username: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
