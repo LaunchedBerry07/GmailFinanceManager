@@ -5,6 +5,12 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { pool } from "./db";
 
+// Enforce session secret in production
+if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+  log("FATAL ERROR: SESSION_SECRET environment variable is not set.", "startup");
+  process.exit(1);
+}
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -17,7 +23,7 @@ app.use(session({
     tableName: 'session',
     createTableIfMissing: true
   }),
-  secret: process.env.SESSION_SECRET || 'databerry-finance-manager-secret',
+  secret: process.env.SESSION_SECRET || 'dev-secret-placeholder', // Fallback only for development
   resave: false,
   saveUninitialized: false,
   cookie: {
