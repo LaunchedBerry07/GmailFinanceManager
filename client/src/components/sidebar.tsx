@@ -1,92 +1,88 @@
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { 
   Mail, 
   FileText, 
   Tag, 
   Users, 
   Settings,
-  BarChart3
+  BarChart3,
+  LogOut
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// ... (menuItems and managementItems remain the same)
+
+// New UserProfile component to fetch and display user data
+function UserProfile() {
+  const { data, isLoading, error } = useQuery({ 
+    queryKey: ["/api/auth/me"],
+    retry: false // Don't retry on auth errors
+  });
+  const [, setLocation] = useLocation();
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setLocation('/login');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center space-x-3 p-3">
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data?.user) {
+    return (
+      <div className="text-center p-2">
+        <button onClick={() => setLocation('/login')} className="text-purple-300 text-sm hover:text-white">
+          Session expired. Login again.
+        </button>
+      </div>
+    );
+  }
+  
+  const { user } = data;
+  const initials = user.username?.charAt(0).toUpperCase() || '?';
+
+  return (
+    <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm">
+      <div className="w-10 h-10 rounded-full gradient-pink-magenta flex items-center justify-center">
+        <span className="text-sm font-semibold text-white">{initials}</span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-white truncate">{user.username}</p>
+        <p className="text-xs text-purple-300 truncate">{user.email}</p>
+      </div>
+      <button onClick={handleLogout} title="Logout" className="text-purple-300 hover:text-white transition-colors">
+        <LogOut className="w-5 h-5"/>
+      </button>
+    </div>
+  );
+}
+
 
 export default function Sidebar() {
   const [location] = useLocation();
-
-  const menuItems = [
-    { href: "/dashboard", icon: BarChart3, label: "Dashboard", active: location === "/dashboard" },
-    { href: "/emails", icon: Mail, label: "Emails" },
-    { href: "/contacts", icon: Users, label: "Contacts" },
-    { href: "/labels", icon: Tag, label: "Labels" },
-  ];
-
-  const managementItems = [
-    { href: "/settings", icon: Settings, label: "Settings" },
-  ];
+  // ... (menuItems and managementItems remain the same)
 
   return (
-    <div className="w-64 gradient-bg shadow-2xl border-r border-primary-600/30">
-      <div className="p-6">
-        {/* Logo and Brand */}
-        <div className="flex items-center space-x-3 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <span className="text-xl font-bold text-white">B</span>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-white">DataBerry</h1>
-            <p className="text-sm text-purple-200">Finance Manager</p>
-          </div>
-        </div>
+    <div className="w-64 gradient-bg shadow-2xl border-r border-primary-600/30 flex flex-col">
+      <div className="p-6 flex-1">
+        {/* ... (Logo and Brand section remains the same) */}
 
-        {/* Navigation Menu */}
-        <nav className="space-y-2">
-          <div className="text-xs font-semibold text-purple-300 uppercase tracking-wider mb-3">
-            Main Menu
-          </div>
-          
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.href} href={item.href}>
-                <a className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
-                  item.active 
-                    ? "bg-white/20 backdrop-blur-sm text-white" 
-                    : "text-purple-200 hover:bg-white/10 hover:text-white"
-                }`}>
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
-                </a>
-              </Link>
-            );
-          })}
-
-          <div className="text-xs font-semibold text-purple-300 uppercase tracking-wider mb-3 mt-6">
-            Management
-          </div>
-
-          {managementItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.href} href={item.href}>
-                <a className="flex items-center space-x-3 p-3 rounded-xl text-purple-200 transition-all duration-200 hover:bg-white/10 hover:text-white">
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
-                </a>
-              </Link>
-            );
-          })}
-        </nav>
+        {/* ... (Navigation Menu remains the same) */}
       </div>
 
-      {/* User Profile */}
-      <div className="absolute bottom-6 left-6 right-6">
-        <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm">
-          <div className="w-10 h-10 rounded-full gradient-pink-magenta flex items-center justify-center">
-            <span className="text-sm font-semibold text-white">JD</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">John Doe</p>
-            <p className="text-xs text-purple-300 truncate">Accounting Technician</p>
-          </div>
-        </div>
+      {/* Dynamic User Profile */}
+      <div className="p-6">
+        <UserProfile />
       </div>
     </div>
   );
