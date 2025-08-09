@@ -30,6 +30,18 @@ export interface IStorage {
   // Attachment operations
   createAttachment(attachment: InsertAttachment): Promise<Attachment>;
   getEmailAttachments(emailId: string): Promise<Attachment[]>;
+
+// Add this new route in server/routes.ts, for example, before the /api/dashboard/metrics route
+
+app.get("/api/contacts", requireAuth, async (req, res) => {
+    try {
+    const contacts = await storage.getContacts();
+    res.json(contacts);
+    } catch (error) {
+    console.error("Error fetching contacts:", error);
+    res.status(500).json({ error: "Failed to fetch contacts" });
+    }
+});
   
   // Dashboard metrics
   getDashboardMetrics(): Promise<DashboardMetrics>;
