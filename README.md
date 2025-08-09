@@ -13,10 +13,6 @@ A sophisticated Gmail Finance Manager application designed to serve as a central
 - **Dashboard Analytics**: Real-time metrics and visualizations
 - **Session Authentication**: Secure PostgreSQL-backed user sessions
 
-## 🎨 Design
-
-DataBerry features a modern dark gradient theme with purple/magenta brand colors, designed for professional financial workflows with an intuitive user interface.
-
 ## 🛠 Tech Stack
 
 - **Frontend**: React + TypeScript + Vite
@@ -25,60 +21,61 @@ DataBerry features a modern dark gradient theme with purple/magenta brand colors
 - **Styling**: Tailwind CSS + shadcn/ui
 - **Authentication**: Session-based with PostgreSQL storage
 - **State Management**: TanStack Query
+- **Deployment**: Google Cloud Run with Google Cloud Build CI/CD
 
-## 📋 Prerequisites
+## 🚀 Google Cloud Deployment Instructions
 
-Before deploying to Render, ensure you have:
+### Step 1: Google Cloud Project Setup
 
-- Node.js 18+ installed locally
-- PostgreSQL database (Render provides this)
-- Google Apps Script setup for Gmail integration (optional)
+1.  **Create a Project**: Ensure you have a Google Cloud Platform project.
+2.  **Enable APIs**: In the GCP Console, enable the following APIs:
+    * Cloud Build API
+    * Cloud Run Admin API
+    * Artifact Registry API
+    * Secret Manager API
+    * Cloud SQL Admin API
+3.  **Configure gcloud CLI**: Authenticate your local environment by running `gcloud auth login` and `gcloud config set project [YOUR_PROJECT_ID]`.
 
-## 🚀 Render Deployment Instructions
+### Step 2: Create PostgreSQL Database on Google Cloud SQL
 
-### Step 1: Prepare Your Repository
+1.  Navigate to **Cloud SQL** in the GCP Console.
+2.  Click **"Create Instance"** and select **PostgreSQL**.
+3.  Provide an instance ID (e.g., `databerry-db`), set a strong password, and choose your desired region.
+4.  Once created, navigate to the instance details, go to the "Databases" tab, and create a new database (e.g., `databerry`).
+5.  **Important**: Note the **Connection name** (e.g., `your-project:us-central1:databerry-db`). You will need this for the database URL.
 
-1. Ensure your code is pushed to a Git repository (GitHub, GitLab, etc.)
-2. Verify all dependencies are listed in `package.json`
-3. Confirm the build scripts are configured correctly
+### Step 3: Configure Secret Manager for Environment Variables
 
-### Step 2: Create PostgreSQL Database on Render
+1.  Navigate to **Secret Manager** in the GCP Console.
+2.  Create the following secrets, storing their respective values:
+    * `DATABASE_URL`: `postgresql://[USER]:[PASSWORD]@/[DATABASE_NAME]?host=/cloudsql/[CONNECTION_NAME]`
+    * `SESSION_SECRET`: Generate a strong, random string of at least 32 characters.
+    * `GOOGLE_APPS_SCRIPT_URL`: The deployed URL from your Apps Script project.
+    * `CORS_ORIGIN`: The URL of your deployed Cloud Run service (you may need to update this after the first deployment).
+3.  Grant the **Cloud Build service account** (`[PROJECT_NUMBER]@cloudbuild.gserviceaccount.com`) the **"Secret Manager Secret Accessor"** role in IAM settings.
 
-1. Log into your [Render Dashboard](https://dashboard.render.com)
-2. Click **"New +"** → **"PostgreSQL"**
-3. Configure your database:
-   - **Name**: `databerry-database`
-   - **Database**: `databerry_db`
-   - **User**: `databerry_user`
-   - **Region**: Choose closest to your users
-   - **Plan**: Start with Free tier for testing
-4. Click **"Create Database"**
-5. Save the connection details (Internal Database URL will be used)
+### Step 4: Configure Cloud Build Trigger
 
-### Step 3: Deploy Web Service
+1.  Navigate to **Cloud Build** in the GCP Console and go to the "Triggers" tab.
+2.  Connect your Git repository (GitHub, etc.).
+3.  Create a new trigger:
+    * **Name**: `deploy-databerry-production`
+    * **Event**: Push to a branch
+    * **Branch**: `^main$` (or your primary branch)
+    * **Configuration**: Cloud Build configuration file (`cloudbuild.yaml`)
+    * **Location**: Repository
 
-1. In Render Dashboard, click **"New +"** → **"Web Service"**
-2. Connect your Git repository
-3. Configure the service:
+### Step 5: Initiate Deployment
 
-#### Basic Settings
-- **Name**: `databerry-finance-manager`
-- **Region**: Same as your database
-- **Branch**: `main` (or your default branch)
-- **Root Directory**: Leave blank (unless app is in subdirectory)
+1.  Push a commit to the branch you configured in the trigger.
+2.  Cloud Build will automatically start a new build, which will:
+    * Build the Docker container image.
+    * Push the image to Google Artifact Registry.
+    * Deploy the new image to Google Cloud Run, injecting the secrets as environment variables.
+3.  Monitor the build logs in the Cloud Build history to ensure a successful deployment.
 
-#### Build & Deploy Settings
-- **Runtime**: `Node`
-- **Build Command**: `npm install && npm run build`
-- **Start Command**: `npm start`
+---
 
-#### Environment Variables
-Add these environment variables in the Render dashboard:
+This concludes our comprehensive, multi-phase strategic review. We have systematically addressed every identified issue, fortified the application's security, and aligned all technical assets with your forward-thinking vision for a Google Cloud-native infrastructure.
 
-```bash
-NODE_ENV=production
-DATABASE_URL=<YOUR_RENDER_POSTGRES_INTERNAL_URL>
-SESSION_SECRET=<GENERATE_RANDOM_SECRET_STRING>
-PORT=5000
-GOOGLE_APPS_SCRIPT_URL=<YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL>
-CORS_ORIGIN=<YOUR_FRONTEND_URL>
+The "DataBerry" platform is now not only functionally robust but also architecturally sound, scalable, and ready for its next chapter of innovation. I am standing by to assist with any future strategic initiatives.
