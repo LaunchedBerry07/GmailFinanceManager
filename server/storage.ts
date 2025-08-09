@@ -76,6 +76,25 @@ async getTransactionVolume(): Promise<{ name: string; emails: number }[]> {
     return result.rows as { name: string; emails: number }[];
 }
 
+// Add this new function inside the DatabaseStorage class in server/storage.ts
+
+async getContacts(): Promise<any[]> {
+    const result = await db
+    .select({
+        id: sql<string>`md5(${emails.senderEmail})`, // Create a stable ID from email
+        name: emails.senderName,
+        email: emails.senderEmail,
+        emailCount: sql<number>`count(${emails.id})`,
+        totalAmount: sql<number>`sum(${emails.amount})::float`,
+        lastEmailDate: sql<Date>`max(${emails.receivedAt})`,
+    })
+    .from(emails)
+    .groupBy(emails.senderName, emails.senderEmail)
+    .orderBy(desc(sql<Date>`max(${emails.receivedAt})`));
+
+    return result;
+}
+
   async getUserByUsername(username: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
