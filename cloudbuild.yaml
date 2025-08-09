@@ -1,5 +1,4 @@
 steps:
-  # 1. Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     id: Build
     args:
@@ -8,18 +7,14 @@ steps:
       - 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:latest'
       - '.'
 
-  # 2. Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     id: Push
     args:
       - 'push'
       - 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:latest'
 
-# Specify the image to be used by the Cloud Run deployment
 images:
   - 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:latest'
 
-# --- MISSION-CRITICAL LOGGING FIX ---
-# This option resolves the error by sending logs directly to Cloud Logging.
     options:
       logging: CLOUD_LOGGING_ONLY
