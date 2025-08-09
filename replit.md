@@ -84,3 +84,5 @@ Successfully migrated and enhanced the DataBerry Gmail Finance Manager:
 - **Database Hosting**: Google Cloud SQL for PostgreSQL (production) / Neon (development)
 - **Static Assets**: Served through Vite build system with Express static middleware
 - **Environment Configuration**: Environment variables for database URLs and Google Apps Script endpoints
+
+TODO
