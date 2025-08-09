@@ -11,7 +11,7 @@ steps:
     id: 'Push Image'
     args: ['push', 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:$COMMIT_SHA']
 
-  # STEP 3: Deploy the container image to Cloud Run
+   # STEP 3: Deploy the container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy to Cloud Run'
     entrypoint: gcloud
@@ -23,6 +23,7 @@ steps:
       - '--region=us-central1'
       - '--platform=managed'
       - '--allow-unauthenticated' # Makes the service publicly accessible
+      - '--port=5000' # Explicitly set the container port
 
 # This option ensures logs are sent directly to Cloud Logging.
 options:
