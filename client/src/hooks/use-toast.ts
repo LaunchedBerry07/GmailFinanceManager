@@ -60,11 +60,6 @@ const addToRemoveQueue = (toastId: string) => {
     return
   }
 
-  const addToRemoveQueue = (toastId: string) => {
-  if (toastTimeouts.has(toastId)) { // This line is corrected
-    return;
-  }
-
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId);
     dispatch({
