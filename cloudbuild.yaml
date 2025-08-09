@@ -21,6 +21,5 @@ images:
 
 # --- MISSION-CRITICAL LOGGING FIX ---
 # This option resolves the error by sending logs directly to Cloud Logging.
-logsBucket: 'gs://gfm-logs'
     options:
-      logging: GCS_ONLY
+      logging: CLOUD_LOGGING_ONLY
