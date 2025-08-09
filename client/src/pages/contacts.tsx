@@ -3,49 +3,28 @@ import { useQuery } from "@tanstack/react-query";
 import Sidebar from "@/components/sidebar";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Mail, Building, Phone } from "lucide-react";
 
 interface Contact {
   id: string;
   name: string;
   email: string;
-  company?: string;
-  phone?: string;
   emailCount: number;
   totalAmount: number;
-  lastEmailDate: Date;
+  lastEmailDate: string; // Comes as string from JSON
 }
 
 export default function ContactsPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Mock data for contacts (Phase 7 requirements)
-  const contacts: Contact[] = [
-    {
-      id: "1",
-      name: "Amazon Services",
-      email: "orders@amazon.com",
-      company: "Amazon",
-      emailCount: 15,
-      totalAmount: 1245.67,
-      lastEmailDate: new Date("2024-08-08"),
-    },
-    {
-      id: "2", 
-      name: "Netflix Support",
-      email: "billing@netflix.com",
-      company: "Netflix Inc.",
-      emailCount: 3,
-      totalAmount: 45.97,
-      lastEmailDate: new Date("2024-08-05"),
-    },
-  ];
+  const { data: contacts = [], isLoading } = useQuery<Contact[]>({
+    queryKey: ["/api/contacts"],
+  });
 
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.company?.toLowerCase().includes(searchQuery.toLowerCase())
+    contact.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -76,7 +55,12 @@ export default function ContactsPage() {
 
           {/* Contacts Grid */}
           <div className="gradient-card rounded-2xl overflow-hidden">
-            {filteredContacts.length === 0 ? (
+            {isLoading ? (
+              <div className="p-4">
+                <Skeleton className="h-12 w-full mb-2" />
+                {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-16 w-full mb-1" />)}
+              </div>
+            ) : filteredContacts.length === 0 ? (
               <div className="p-12 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 gradient-cyan-blue rounded-2xl flex items-center justify-center">
                   <Building className="w-8 h-8 text-white" />
@@ -92,7 +76,6 @@ export default function ContactsPage() {
                   <thead className="bg-primary-600/30 backdrop-blur-sm">
                     <tr>
                       <th className="px-6 py-4 text-left text-xs font-medium text-purple-300 uppercase tracking-wider">Contact</th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-purple-300 uppercase tracking-wider">Company</th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-purple-300 uppercase tracking-wider">Emails</th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-purple-300 uppercase tracking-wider">Total Amount</th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-purple-300 uppercase tracking-wider">Last Email</th>
@@ -119,12 +102,6 @@ export default function ContactsPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center text-purple-300">
-                            <Building className="w-4 h-4 mr-2" />
-                            {contact.company || "—"}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
                           <div className="flex items-center">
                             <div className="px-3 py-1 bg-primary-600/50 rounded-full">
                               <span className="text-white text-sm font-medium">{contact.emailCount}</span>
@@ -133,12 +110,12 @@ export default function ContactsPage() {
                         </td>
                         <td className="px-6 py-4">
                           <span className="text-white font-semibold">
-                            ${contact.totalAmount.toFixed(2)}
+                            ${(contact.totalAmount || 0).toFixed(2)}
                           </span>
                         </td>
                         <td className="px-6 py-4">
                           <span className="text-purple-300">
-                            {contact.lastEmailDate.toLocaleDateString()}
+                            {new Date(contact.lastEmailDate).toLocaleDateString()}
                           </span>
                         </td>
                         <td className="px-6 py-4">
