@@ -63,8 +63,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  app.get("/api/auth/me", requireAuth, (req, res) => {
-    res.json({ user: req.session.user });
+// Add this endpoint in server/routes.ts, for example, after the /api/auth/logout route
+
+  app.get("/api/auth/me", (req, res) => {
+    if (req.session.user) {
+      res.json({ user: req.session.user });
+    } else {
+      res.status(401).json({ error: "Not authenticated" });
+    }
   });
 
   // Sync emails endpoint
