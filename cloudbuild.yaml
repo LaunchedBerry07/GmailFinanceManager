@@ -2,20 +2,17 @@
 
 steps:
   # STEP 1: Build the container image using the Dockerfile
-  # This step finds the 'Dockerfile' in the current directory (.) and builds an image.
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build Image'
     args: ['build', '-t', 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:$COMMIT_SHA', '.']
 
   # STEP 2: Push the container image to Google Artifact Registry
-  # This pushes the newly built image to a secure registry where Cloud Run can access it.
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push Image'
     args: ['push', 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:$COMMIT_SHA']
 
   # STEP 3: Deploy the container image to Cloud Run
-  # This step takes the image we just pushed and deploys it as a new revision to your Cloud Run service.
-  - name: 'gcr.io/google-cloud-sdk/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy to Cloud Run'
     entrypoint: gcloud
     args:
@@ -27,6 +24,6 @@ steps:
       - '--platform=managed'
       - '--allow-unauthenticated' # Makes the service publicly accessible
 
-# This option ensures logs are sent directly to Cloud Logging, resolving the initial error.
+# This option ensures logs are sent directly to Cloud Logging.
 options:
   logging: CLOUD_LOGGING_ONLY
