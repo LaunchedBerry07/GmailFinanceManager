@@ -9,6 +9,12 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# --- MISSION-CRITICAL PERMISSION FIX ---
+# Grant execute permissions to the Next.js CLI tool before running the build.
+RUN chmod +x /app/node_modules/.bin/next
+
+# Run the production build
 RUN npm run build
 
 # Stage 3: Production image
