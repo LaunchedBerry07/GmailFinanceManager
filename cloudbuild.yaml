@@ -1,25 +1,32 @@
+# This file defines the complete CI/CD pipeline: Build, Push, and Deploy.
+
 steps:
-  # 1. Build the container image
+  # STEP 1: Build the container image using the Dockerfile
+  # This step finds the 'Dockerfile' in the current directory (.) and builds an image.
   - name: 'gcr.io/cloud-builders/docker'
-    id: Build
-    args:
-      - 'build'
-      - '-t'
-      - 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:latest'
-      - '.'
+    id: 'Build Image'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:$COMMIT_SHA', '.']
 
-  # 2. Push the container image to Artifact Registry
+  # STEP 2: Push the container image to Google Artifact Registry
+  # This pushes the newly built image to a secure registry where Cloud Run can access it.
   - name: 'gcr.io/cloud-builders/docker'
-    id: Push
+    id: 'Push Image'
+    args: ['push', 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:$COMMIT_SHA']
+
+  # STEP 3: Deploy the container image to Cloud Run
+  # This step takes the image we just pushed and deploys it as a new revision to your Cloud Run service.
+  - name: 'gcr.io/google-cloud-sdk/gcloud'
+    id: 'Deploy to Cloud Run'
+    entrypoint: gcloud
     args:
-      - 'push'
-      - 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:latest'
+      - 'run'
+      - 'deploy'
+      - 'gmail-finance-manager' # The name of your Cloud Run service
+      - '--image=us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:$COMMIT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated' # Makes the service publicly accessible
 
-# Specify the image to be used by the Cloud Run deployment
-images:
-  - 'us-central1-docker.pkg.dev/launchedberry/gmail-finance-manager/app:latest'
-
-# --- MISSION-CRITICAL LOGGING FIX ---
-# This option resolves the error by sending logs directly to Cloud Logging.
+# This option ensures logs are sent directly to Cloud Logging, resolving the initial error.
 options:
   logging: CLOUD_LOGGING_ONLY
