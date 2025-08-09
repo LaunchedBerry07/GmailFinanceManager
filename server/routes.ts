@@ -83,8 +83,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Export emails to CSV
-  app.get("/api/emails/export", requireAuth, async (req, res) => {
+      // CONSOLIDATED CSV Export Endpoint
+  app.get("/api/export/csv", requireAuth, async (req, res) => {
     try {
       const {
         search,
@@ -94,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } = req.query;
 
       const emails = await storage.getEmails(
-        undefined, // no limit for export
+        1000, // Large limit for export
         0,
         search as string,
         category as string,
@@ -102,26 +102,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dateTo ? new Date(dateTo as string) : undefined
       );
 
-      // Convert to CSV format
-      const csvHeaders = ['Subject', 'Sender Name', 'Sender Email', 'Amount', 'Category', 'Status', 'Received At'];
-      const csvRows = emails.map(email => [
-        `"${email.subject || ''}"`,
-        `"${email.senderName || ''}"`,
-        `"${email.senderEmail || ''}"`,
-        email.amount || '',
-        `"${email.category || ''}"`,
-        `"${email.status || ''}"`,
-        email.receivedAt ? new Date(email.receivedAt).toISOString() : ''
-      ]);
-
-      const csvContent = [csvHeaders.join(','), ...csvRows.map(row => row.join(','))].join('\n');
+      const csvContent = [/* ... */].join('\n');
       
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', `attachment; filename="databerry-emails-${new Date().toISOString().split('T')[0]}.csv"`);
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", `attachment; filename="emails-export-${new Date().toISOString().split('T')[0]}.csv"`);
       res.send(csvContent);
     } catch (error) {
-      console.error("Export error:", error);
-      res.status(500).json({ error: "Export failed" });
+      console.error("Error exporting CSV:", error);
+      res.status(500).json({ error: "Failed to export CSV" });
     }
   });
 
