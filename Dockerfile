@@ -2,7 +2,7 @@
 FROM node:18-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm cache clean --force && npm install
 
 # Stage 2: Build the application
 FROM node:18-alpine AS builder
