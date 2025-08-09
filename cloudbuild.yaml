@@ -23,7 +23,6 @@ steps:
       - '--region=us-central1'
       - '--platform=managed'
       - '--allow-unauthenticated'
-      - '--port=5000'
       - '--update-secrets=DATABASE_URL=DATABASE_URL:latest,SESSION_SECRET=SESSION_SECRET:latest'
 
 # This option ensures logs are sent directly to Cloud Logging.
